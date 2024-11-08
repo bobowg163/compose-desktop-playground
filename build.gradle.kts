@@ -1,8 +1,9 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
-    id("org.jetbrains.kotlin.plugin.serialization") apply false
 }
 
 group = "bobowg"
@@ -21,9 +22,11 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
 
     implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
+}
 
-
-
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
 }
 
 compose.desktop {
