@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -16,8 +17,6 @@ fun main() = application {
     val isOpen = remember { mutableStateOf(true) }
     val show = rememberSaveable { mutableStateOf(true) }
     var secondWindow by remember { mutableStateOf(false) }
-    var apiRespose by remember { mutableStateOf("Waiting ...") }
-    val scope = rememberCoroutineScope()
     if (isOpen.value) {
         isOpen.value = BuildTray(isOpen, show)
         Window(
@@ -37,6 +36,8 @@ fun main() = application {
                 }) {
                     Text("显示第二窗口")
                     if (secondWindow) {
+                        var text by remember { mutableStateOf("Hello World!") }
+                        var conut by remember { mutableStateOf(0) }
                         Window(
                             title = "第二窗口",
                             onCloseRequest = {
@@ -46,15 +47,22 @@ fun main() = application {
                             resizable = false
                         ) {
                             MenuBarWeather(isOpen, show)
-                            Column {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
                                 Button(
-                                    onClick = {}
+                                    onClick = {
+                                        text = "click Count ${conut++}"
+                                    },
                                 ){
                                     Text("Click me")
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = apiRespose
+                                    text = text,
+                                    color = Color.Black
                                 )
                             }
                         }
