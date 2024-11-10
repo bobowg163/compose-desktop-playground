@@ -32,11 +32,29 @@ tasks.withType<KotlinCompile> {
 compose.desktop {
     application {
         mainClass = "MainKt"
-
+        javaHome = System.getenv("JAVA_HOME")
         nativeDistributions {
+            modules("java.sql")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Compose-for-desktopplayground"
             packageVersion = "1.0.0"
+
+            linux {
+                packageVersion = "1.0.1"
+                debPackageVersion = "1.0.1"
+                rpmPackageVersion = "1.0.1"
+                iconFile.set(project.file("icon.png"))
+            }
+            macOS {
+                packageVersion = "1.0.0"
+                dmgPackageVersion = "1.0.0"
+                pkgPackageVersion = "1.0.0"
+            }
+            windows {
+                packageVersion = "1.0.0"
+                exePackageVersion = "1.0.0"
+                msiPackageVersion = "1.0.0"
+            }
         }
     }
 }
