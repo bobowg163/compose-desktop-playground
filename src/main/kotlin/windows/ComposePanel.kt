@@ -6,19 +6,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.Dimension
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
+import javax.swing.*
 import javax.swing.WindowConstants.EXIT_ON_CLOSE
 
 val northClicks = mutableStateOf(0)
@@ -51,19 +51,95 @@ fun main() = SwingUtilities.invokeLater {
 @Composable
 @Preview
 fun ComposeContent() {
+    var action by remember { mutableStateOf(false) }
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Row {
-            Counter("西", westClicks)
-            Spacer(modifier = Modifier.width(25.dp))
-            Counter("北", northClicks)
-            Spacer(modifier = Modifier.width(25.dp))
-            Counter("东", eastClicks)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+        ) {
+            Row {
+                Counter("西", westClicks)
+                Spacer(modifier = Modifier.width(25.dp))
+                Counter("北", northClicks)
+                Spacer(modifier = Modifier.width(25.dp))
+                Counter("东", eastClicks)
+                Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
+                    Button(onClick = { action = true }) {
+                        Text(text = "第二窗口")
+                    }
+                }
+
+            }
         }
+        if (action) {
+            Window(
+                title = "使用 SwingPanel 将 Swing 组件添加到 Compose Multiplatform 组合中",
+                onCloseRequest = { action = false },
+                state = WindowState(width = 400.dp, height = 400.dp)
+            ) {
+                val counter = remember { mutableStateOf(0) }
+                val inc: () -> Unit = { counter.value++ }
+                val dec: () -> Unit = { counter.value-- }
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(60.dp).padding(top = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Counter: ${counter.value}")
+                }
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.padding(top = 80.dp, bottom = 20.dp)
+                    ) {
+                        Button("1. Compose Button: increment", inc)
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        SwingPanel(
+                            background = Color.White,
+                            modifier = Modifier.size(270.dp, 90.dp),
+                            factory = {
+                                JPanel().apply {
+                                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
+//                                    add(actionButton("1. Swing Button: decrement", dec))
+//                                    add(actionButton("2. Swing Button: decrement", dec))
+//                                    add(actionButton("3. Swing Button: decrement", dec))
+                                }
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Button("2. Compose Button: increment", inc)
+                    }
+                }
+
+            }
+        }
+
     }
 }
+
+@Composable
+fun Button(text: String = "", onClick: (() -> Unit)? = null) {
+    androidx.compose.material.Button(modifier = Modifier.size(270.dp, 30.dp), onClick = { onClick?.invoke() }) {
+        Text(text)
+    }
+}
+
+//fun actionButton(
+//    text: String,
+//    action: () -> Unit
+//): JButton {
+//    val button = JButton(text)
+//    button.alignmentX = Component.CENTER_ALIGNMENT
+//    button.addActionListener { action() }
+//
+//    return button
+//}
 
 @Composable
 fun Counter(text: String, counter: MutableState<Int>) {
@@ -72,7 +148,7 @@ fun Counter(text: String, counter: MutableState<Int>) {
         color = Color(180, 180, 180),
         shape = RoundedCornerShape(4.dp)
     ) {
-        Column {
+        Column(modifier = Modifier.padding(16.dp)) {
             Box(modifier = Modifier.height(30.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
                 Text(text = "${text}单击：${counter.value}")
             }
