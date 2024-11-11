@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import java.awt.BorderLayout
-import java.awt.Component
 import java.awt.Dimension
 import javax.swing.*
 import javax.swing.WindowConstants.EXIT_ON_CLOSE
@@ -105,9 +104,9 @@ fun ComposeContent() {
                             factory = {
                                 JPanel().apply {
                                     layout = BoxLayout(this, BoxLayout.Y_AXIS)
-//                                    add(actionButton("1. Swing Button: decrement", dec))
-//                                    add(actionButton("2. Swing Button: decrement", dec))
-//                                    add(actionButton("3. Swing Button: decrement", dec))
+                                    add(actionButton("1. Swing Button: decrement", dec))
+                                    add(actionButton("2. Swing Button: decrement", dec))
+                                    add(actionButton("3. Swing Button: decrement", dec))
                                 }
                             }
                         )
@@ -125,7 +124,7 @@ fun ComposeContent() {
 
 @Composable
 fun Button(text: String = "", onClick: (() -> Unit)? = null) {
-    androidx.compose.material.Button(modifier = Modifier.size(270.dp, 30.dp), onClick = { onClick?.invoke() }) {
+    Button(modifier = Modifier.size(270.dp, 30.dp), onClick = { onClick?.invoke() }) {
         Text(text)
     }
 }
