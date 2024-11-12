@@ -15,7 +15,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
+import androidx.compose.ui.window.application
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.Dimension
 import javax.swing.*
 import javax.swing.WindowConstants.EXIT_ON_CLOSE
@@ -23,6 +25,8 @@ import javax.swing.WindowConstants.EXIT_ON_CLOSE
 val northClicks = mutableStateOf(0)
 val westClicks = mutableStateOf(0)
 val eastClicks = mutableStateOf(0)
+
+val swingLabel = JLabel()
 
 fun main() = SwingUtilities.invokeLater {
     val window = JFrame()
@@ -51,6 +55,7 @@ fun main() = SwingUtilities.invokeLater {
 @Preview
 fun ComposeContent() {
     var action by remember { mutableStateOf(false) }
+    var action1 by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         contentAlignment = Alignment.Center
@@ -66,9 +71,15 @@ fun ComposeContent() {
                 Spacer(modifier = Modifier.width(25.dp))
                 Counter("东", eastClicks)
                 Row(modifier = Modifier.fillMaxWidth().padding(10.dp)) {
-                    Button(onClick = { action = true }) {
-                        Text(text = "第二窗口")
+                    Column {
+                        Button(onClick = { action = true }) {
+                            Text(text = "第二窗口")
+                        }
+                        Button(onClick = { action1 = true }) {
+                            Text(text = "第三窗口")
+                        }
                     }
+
                 }
 
             }
@@ -104,9 +115,9 @@ fun ComposeContent() {
                             factory = {
                                 JPanel().apply {
                                     layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                                    add(actionButton("1. Swing Button: decrement", dec))
-                                    add(actionButton("2. Swing Button: decrement", dec))
-                                    add(actionButton("3. Swing Button: decrement", dec))
+                                    add(actionButton1("1. Swing Button: decrement", dec))
+                                    add(actionButton1("2. Swing Button: decrement", dec))
+                                    add(actionButton1("3. Swing Button: decrement", dec))
                                 }
                             }
                         )
@@ -119,8 +130,44 @@ fun ComposeContent() {
             }
         }
 
+        if (action1) {
+            Window(
+                onCloseRequest = { action1 = false },
+                title = "当 Compose 状态更改时更新 Swing 组件",
+                state = WindowState(width = 400.dp, height = 200.dp)
+            ) {
+                val click = remember { mutableStateOf(0) }
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    SwingPanel(
+                        modifier = Modifier.fillMaxWidth().height(40.dp),
+                        factory = {
+                            JPanel().apply {
+                                add(swingLabel, BorderLayout.CENTER)
+                            }
+                        },
+                        update = {
+                            swingLabel.setText("SwingLabel Clicks: ${click.value}")
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(40.dp))
+                    Row(modifier = Modifier.height(40.dp), verticalAlignment = Alignment.CenterVertically) {
+                       Button(onClick = {click.value++}){
+                            Text("相加")
+                        }
+                        Spacer(modifier = Modifier.width(40.dp))
+                        Button(onClick = {click.value--}){
+                            Text("相减")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
+
 
 @Composable
 fun Button(text: String = "", onClick: (() -> Unit)? = null) {
@@ -129,16 +176,15 @@ fun Button(text: String = "", onClick: (() -> Unit)? = null) {
     }
 }
 
-//fun actionButton(
-//    text: String,
-//    action: () -> Unit
-//): JButton {
-//    val button = JButton(text)
-//    button.alignmentX = Component.CENTER_ALIGNMENT
-//    button.addActionListener { action() }
-//
-//    return button
-//}
+fun actionButton1(
+    text: String,
+    action: () -> Unit
+): JButton {
+    val button = JButton(text)
+    button.alignmentX = Component.CENTER_ALIGNMENT
+    button.addActionListener { action() }
+    return button
+}
 
 @Composable
 fun Counter(text: String, counter: MutableState<Int>) {
