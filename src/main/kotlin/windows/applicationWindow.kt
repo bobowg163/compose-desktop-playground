@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.delay
@@ -13,6 +14,8 @@ import kotlinx.coroutines.delay
 fun main() = application {
     var filename by remember { mutableStateOf("窗口") }
     var sendonde by remember { mutableStateOf(false) }
+    var isOpen by remember { mutableStateOf(false) }
+    var isAskingToClose by remember { mutableStateOf(false) }
     Window(
         onCloseRequest = ::exitApplication,
         title = "$filename: 编辑",
@@ -32,6 +35,31 @@ fun main() = application {
                 onClick = { sendonde = !sendonde }
             ) {
                 Text("第二窗口")
+            }
+            Button(
+                modifier = Modifier.size(width = 250.dp, height = 80.dp).padding(16.dp),
+                onClick = { isOpen = true }
+            ) {
+                Text("第三窗口")
+            }
+        }
+
+        if (isOpen) {
+            Window(
+                onCloseRequest = { isAskingToClose = true }
+            ) {
+                if (isAskingToClose) {
+                    DialogWindow(
+                        onCloseRequest = { isAskingToClose = false },
+                        title = "Close the document without saving?",
+                    ) {
+                        Button(
+                            onClick = { isOpen = false }
+                        ) {
+                            Text("Yes")
+                        }
+                    }
+                }
             }
         }
 
